@@ -1,9 +1,10 @@
 import { FC } from "react";
+import { Car } from "../components/Car";
 
 const Garage: FC<{}> = () => {
   return (
     <>
-      This is garage page!
+      <Car />
     </>
   );
 }

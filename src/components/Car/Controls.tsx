@@ -2,7 +2,7 @@ import styles from "./style.module.scss";
 
 import { FC } from "react";
 
-export const Controls: FC<{}> = () => {
+export const Controls: FC = () => {
   return (
     <div>
       <button

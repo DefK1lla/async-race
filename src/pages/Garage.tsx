@@ -1,10 +1,10 @@
 import { FC } from "react";
-import { Car } from "../components/Car";
+import { CarForm } from "../components/Car";
 
 const Garage: FC<{}> = () => {
   return (
     <>
-      <Car />
+      <CarForm />
     </>
   );
 }

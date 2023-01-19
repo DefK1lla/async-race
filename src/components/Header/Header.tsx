@@ -6,7 +6,9 @@ import { Container } from "../layout/Container";
 
 export const Header: FC<{}> = () => {
   return (
-    <header>
+    <header
+      className={styles.header}
+    >
       <Container>
         <Link
           to="/"

@@ -15,6 +15,12 @@ export const Controls: FC = () => {
       >
         B
       </button>
+
+      <button
+        className={styles.control}
+      >
+        Select
+      </button>
     </div>
   );
 }

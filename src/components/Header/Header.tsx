@@ -4,7 +4,7 @@ import { FC } from "react";
 import { Link } from "react-router-dom";
 import { Container } from "../layout/Container";
 
-export const Header: FC<{}> = () => {
+export const Header: FC = () => {
   return (
     <header
       className={styles.header}

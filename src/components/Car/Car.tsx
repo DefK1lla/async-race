@@ -7,7 +7,7 @@ import { CarIcon } from "./CarIcon";
 import { Flag } from "./Flag";
 import { Controls } from "./Controls";
 
-export const Car: FC<{}> = () => {
+export const Car: FC = () => {
   return (
     <Container>
       <div

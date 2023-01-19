@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-const Winners: FC<{}> = () => {
+const Winners: FC = () => {
   return (
     <>
       This is winners page!

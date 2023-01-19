@@ -1,6 +1,8 @@
 import { FC } from "react";
 
-export const Flag: FC<{ className?: string }> = ({ className }) => {
+import { IFlag } from "../../typings/ICar";
+
+export const Flag: FC<IFlag> = ({ className }) => {
   return (
     <svg className={className} fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 64.001 64.001">

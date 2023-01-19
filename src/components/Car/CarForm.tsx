@@ -4,7 +4,9 @@ import { ChangeEventHandler, FC, FormEventHandler, useState } from "react";
 
 import { Container } from "../layout/Container";
 
-export const CarForm: FC<{ isEdit?: boolean, name?: string, color?: string }> = ({
+import { ICarForm } from "../../typings/ICar";
+
+export const CarForm: FC<ICarForm> = ({
   isEdit = false,
   color = "#00000",
   name = ""
@@ -23,7 +25,7 @@ export const CarForm: FC<{ isEdit?: boolean, name?: string, color?: string }> = 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     console.log(colorValue, nameValue)
-  }
+  };
 
   return (
     <Container>

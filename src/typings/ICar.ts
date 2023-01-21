@@ -34,6 +34,7 @@ export interface ICarProps {
 
 export interface ICarListProps {
   cars: ICar[],
+  page: number,
   onSelect(car: ICar): void,
   onRemove(id: number): void
 };

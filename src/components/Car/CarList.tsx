@@ -5,10 +5,15 @@ import { Container } from "../layout/Container";
 
 import { Car } from "./Car";
 
-export const CarList: FC<ICarListProps> = ({ cars, onSelect, onRemove }) => {
+export const CarList: FC<ICarListProps> = ({
+  cars,
+  page,
+  onSelect,
+  onRemove,
+}) => {
   return (
     <Container>
-      {cars.map((car) => (
+      {cars.map((car, index) => (
         <Car
           key={car.id}
           id={car.id}

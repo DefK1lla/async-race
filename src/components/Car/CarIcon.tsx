@@ -1,7 +1,7 @@
 import { FC } from "react";
-import { ICarIcon } from "../../typings/ICar";
+import { ICarIconProps } from "../../typings/ICar";
 
-export const CarIcon: FC<ICarIcon> = ({ color = "#000", className }) => {
+export const CarIcon: FC<ICarIconProps> = ({ color = "#000", className }) => {
         return (
                 <svg
                         className={className}

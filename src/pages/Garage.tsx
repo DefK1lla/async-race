@@ -3,12 +3,13 @@ import { FC, useEffect, useState } from "react";
 import { CarForm, CarsCount } from "../components/Car";
 import { CarList } from "../components/Car";
 import { Container } from "../components/layout/Container";
+import { Pagination } from "../components/Pagination";
 
 import { ICar } from "../typings/ICar";
 
 const Garage: FC = () => {
   const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(5);
+  const [limit, setLimit] = useState<number>(7);
   const [count, setCount] = useState<number>(0);
   const [cars, setCars] = useState<ICar[]>([]);
   const [selectedCar, setSelectedCar] = useState<ICar>({ name: "", color: "" });
@@ -16,7 +17,7 @@ const Garage: FC = () => {
 
   useEffect(() => {
     getCars();
-  }, []);
+  }, [page, limit]);
 
   const getCars = (): void => {
     fetch(`http://127.0.0.1:3000/garage?_limit=${limit}&_page=${page}`)
@@ -61,6 +62,14 @@ const Garage: FC = () => {
     }).then(() => getCars());
   };
 
+  const handleNext = (): void => {
+    setPage((prevState) => prevState + 1);
+  };
+
+  const handlePrev = (): void => {
+    setPage((prevState) => prevState - 1);
+  };
+
   return (
     <Container>
       <CarForm value={newCar} onChange={setNewCar} onSubmit={handleCreate} />
@@ -71,7 +80,21 @@ const Garage: FC = () => {
         isEdit
       />
       <CarsCount count={count} />
-      <CarList cars={cars} onSelect={handleSelect} onRemove={handleRemove} />
+      <Pagination
+        limit={limit}
+        max={count}
+        currentPage={page}
+        maxPage={Math.ceil(count / limit)}
+        onChange={setLimit}
+        onNext={handleNext}
+        onPrev={handlePrev}
+      />
+      <CarList
+        cars={cars}
+        page={page}
+        onSelect={handleSelect}
+        onRemove={handleRemove}
+      />
     </Container>
   );
 };

@@ -4,27 +4,28 @@ import { ChangeEventHandler, FC, FormEventHandler, useState } from "react";
 
 import { Container } from "../layout/Container";
 
-import { ICarForm } from "../../typings/ICar";
+import { ICar, ICarFormProps } from "../../typings/ICar";
 
-export const CarForm: FC<ICarForm> = ({
+export const CarForm: FC<ICarFormProps> = ({
   isEdit = false,
-  color = "#00000",
-  name = ""
+  value = {
+    color: "#00000",
+    name: "",
+  },
+  onChange,
+  onSubmit
 }) => {
-  const [nameValue, setNameValue] = useState<string>(name);
-  const [colorValue, setColorValue] = useState<string>(color);
-
   const handleNameChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setNameValue(e.target.value);
+    onChange?.({ ...value, name: e.target.value });
   };
 
   const handleColorChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setColorValue(e.target.value);
+    onChange?.({ ...value, color: e.target.value });
   };
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    console.log(colorValue, nameValue)
+    onSubmit?.(value);
   };
 
   return (
@@ -35,13 +36,13 @@ export const CarForm: FC<ICarForm> = ({
       >
         <input
           type="text"
-          value={nameValue}
+          value={value.name}
           placeholder="Car name"
           onChange={handleNameChange}
         />
         <input
           type="color"
-          value={colorValue}
+          value={value.color}
           onChange={handleColorChange}
         />
         <button

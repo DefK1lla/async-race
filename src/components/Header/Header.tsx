@@ -6,24 +6,16 @@ import { Container } from "../layout/Container";
 
 export const Header: FC = () => {
   return (
-    <header
-      className={styles.header}
-    >
+    <header className={styles.header}>
       <Container>
-        <Link
-          to="/"
-          className={styles.link}
-        >
+        <Link to="/" className={styles.link}>
           Garage
         </Link>
 
-        <Link
-          to="/winners"
-          className={styles.link}
-        >
+        <Link to="/winners" className={styles.link}>
           Winners
         </Link>
       </Container>
     </header>
-  )
+  );
 };

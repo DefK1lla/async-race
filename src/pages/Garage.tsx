@@ -72,8 +72,10 @@ const Garage: FC = () => {
     setPage((prevState) => prevState - 1);
   }, []);
 
-  const handleStart = useCallback((id: number): void => {
-    fetch(`http://127.0.0.1:3000/garage/${id}?status=started`)
+  const handleCarStart = useCallback((id: number): void => {
+    fetch(`http://127.0.0.1:3000/engine?id=${id}&status=started`, {
+      method: "PATCH",
+    })
       .then((res: Response) => res.json())
       .then((params: IRace) => {
         setCars((prevState): ICar[] => {
@@ -82,7 +84,24 @@ const Garage: FC = () => {
           );
         });
         return id;
-      });
+      })
+      .then(handleCarDrive);
+  }, []);
+
+  const handleCarDrive = useCallback((id: number): void => {
+    fetch(`http://127.0.0.1:3000/engine?id=${id}&status=drive`, {
+      method: "PATCH",
+    }).then((res: Response) => {
+      if (res.ok) {
+        console.log("ok");
+      } else {
+        setCars((prevState): ICar[] => {
+          return prevState.map((car: ICar) =>
+            car.id === id ? { ...car, status: "stop" } : car
+          );
+        });
+      }
+    });
   }, []);
 
   return (
@@ -108,7 +127,7 @@ const Garage: FC = () => {
         cars={cars}
         onSelect={handleSelect}
         onRemove={handleRemove}
-        onStart={handleStart}
+        onStart={handleCarStart}
       />
     </Container>
   );

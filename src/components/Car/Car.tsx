@@ -11,10 +11,9 @@ import { ICarProps } from "../../typings/ICar";
 
 export const Car: FC<ICarProps> = memo(
   ({ name, id, color, status = "stop", onSelect, onRemove, onStart }) => {
-    console.log(1);
     useEffect(() => {
       if (status === "stop") {
-        console.log("stopeed");
+        console.log("stopped");
       } else if (status === "start") {
         console.log("started");
       } else if (status === "reset") {

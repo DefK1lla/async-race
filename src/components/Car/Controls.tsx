@@ -7,6 +7,8 @@ export const Controls: FC<IControlsProps> = ({
   onSelect,
   onRemove,
   onStart,
+  onReset,
+  isMove = false,
 }) => {
   const handleSelect: MouseEventHandler<HTMLButtonElement> = (e) => {
     onSelect();
@@ -20,12 +22,22 @@ export const Controls: FC<IControlsProps> = ({
     onStart();
   };
 
+  const handleReset: MouseEventHandler<HTMLButtonElement> = (e) => {
+    onReset();
+  };
+
   return (
     <div>
-      <button className={styles.control} onClick={handleStart}>
+      <button
+        className={styles.control}
+        onClick={handleStart}
+        disabled={isMove}
+      >
         A
       </button>
-      <button className={styles.control}>B</button>
+      <button className={styles.control} onClick={handleReset}>
+        B
+      </button>
 
       <button className={styles.control} onClick={handleSelect}>
         Select

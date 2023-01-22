@@ -23,14 +23,19 @@ export interface ICar {
   color: string;
   id?: number;
   name: string;
-  status?: "start" | "stop" | "drive" | "reset";
-  params?: IRace;
+  status?: "start" | "stop" | "reset";
+  velocity?: number;
+  distance?: number;
+  isMove?: boolean;
+  driveController?: AbortController;
 }
 
 export interface ICarProps extends ICar {
   onSelect(car: ICar): void;
   onRemove(id: number): void;
   onStart(id: number): void;
+  onReset(id: number): void;
+  isMove?: boolean;
 }
 
 export interface ICarListProps {
@@ -38,10 +43,13 @@ export interface ICarListProps {
   onSelect(car: ICar): void;
   onRemove(id: number): void;
   onStart(id: number): void;
+  onReset(id: number): void;
 }
 
 export interface IControlsProps {
   onSelect(): void;
   onRemove(): void;
   onStart(): void;
+  onReset(): void;
+  isMove?: boolean;
 }

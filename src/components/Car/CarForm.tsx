@@ -4,7 +4,7 @@ import { ChangeEventHandler, FC, FormEventHandler } from "react";
 
 import { Container } from "../layout/Container";
 
-import { ICar, ICarFormProps } from "../../typings/ICar";
+import { ICarFormProps } from "../../typings/ICar";
 
 export const CarForm: FC<ICarFormProps> = ({
   isEdit = false,
@@ -33,6 +33,7 @@ export const CarForm: FC<ICarFormProps> = ({
       <form className={styles.form} onSubmit={handleSubmit}>
         <input
           type="text"
+          required
           value={value.name}
           placeholder="Car name"
           onChange={handleNameChange}

@@ -6,7 +6,7 @@ import { Container } from "../layout/Container";
 import { Car } from "./Car";
 
 export const CarList: FC<ICarListProps> = memo(
-  ({ cars, onSelect, onRemove, onStart }) => {
+  ({ cars, onSelect, onRemove, onStart, onReset }) => {
     return (
       <Container>
         {cars.map((car) => (
@@ -16,9 +16,13 @@ export const CarList: FC<ICarListProps> = memo(
             name={car.name}
             color={car.color}
             status={car.status}
+            velocity={car.velocity}
+            distance={car.distance}
+            isMove={car.isMove}
             onSelect={onSelect}
             onRemove={onRemove}
             onStart={onStart}
+            onReset={onReset}
           />
         ))}
       </Container>

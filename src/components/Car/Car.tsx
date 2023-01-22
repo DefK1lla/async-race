@@ -1,6 +1,6 @@
 import styles from "./style.module.scss";
 
-import { FC, useEffect, memo } from "react";
+import { FC, useEffect, memo, useRef } from "react";
 
 import { Container } from "../layout/Container";
 import { CarIcon } from "./CarIcon";
@@ -10,14 +10,45 @@ import { Controls } from "./Controls";
 import { ICarProps } from "../../typings/ICar";
 
 export const Car: FC<ICarProps> = memo(
-  ({ name, id, color, status = "stop", onSelect, onRemove, onStart }) => {
+  ({
+    name,
+    id,
+    color,
+    onSelect,
+    onRemove,
+    onStart,
+    onReset,
+    isMove = false,
+    status = "stop",
+    velocity = 0,
+    distance = 0,
+  }) => {
+    const animRef = useRef<Animation>();
+    const carRef = useRef<HTMLSpanElement>(null);
+
     useEffect(() => {
-      if (status === "stop") {
-        console.log("stopped");
-      } else if (status === "start") {
-        console.log("started");
-      } else if (status === "reset") {
-        console.log("reset");
+      if (status === "start") {
+        animRef.current = carRef.current?.animate(
+          {
+            left: "100%",
+          },
+          {
+            duration: distance / velocity,
+            fill: "forwards",
+          }
+        );
+      } else if (status === "stop") {
+        animRef.current?.pause();
+      } else {
+        animRef.current = carRef.current?.animate(
+          {
+            left: "0",
+          },
+          {
+            duration: 0,
+            fill: "forwards",
+          }
+        );
       }
     }, [status]);
 
@@ -33,6 +64,10 @@ export const Car: FC<ICarProps> = memo(
       onStart(id as number);
     };
 
+    const handleReset = (): void => {
+      onReset(id as number);
+    };
+
     return (
       <Container>
         <div className={styles.track}>
@@ -42,9 +77,15 @@ export const Car: FC<ICarProps> = memo(
               onSelect={handleSelect}
               onRemove={handleRemove}
               onStart={handleStart}
+              onReset={handleReset}
+              isMove={isMove}
             />
           </div>
-          <CarIcon className={styles.icon} color={color} />
+          <div className={styles.carT}>
+            <span className={styles.icon} ref={carRef}>
+              <CarIcon color={color} />
+            </span>
+          </div>
           <Flag className={styles.flag} />
         </div>
       </Container>

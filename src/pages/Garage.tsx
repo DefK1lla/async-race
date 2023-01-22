@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { runInThisContext } from "vm";
 
 import { CarForm, CarsCount } from "../components/Car";
@@ -16,6 +16,7 @@ const Garage: FC = () => {
   const [cars, setCars] = useState<ICar[]>([]);
   const [selectedCar, setSelectedCar] = useState<ICar>({ name: "", color: "" });
   const [newCar, setNewCar] = useState<ICar>({ name: "", color: "" });
+  const [isAborted, setIsAborted] = useState<boolean>(false);
 
   useEffect(() => {
     getCars();
@@ -55,7 +56,19 @@ const Garage: FC = () => {
     setSelectedCar(car);
   }, []);
 
+  const handleReset = useCallback((id: number): void => {
+    setCars((prevState) => {
+      const car = prevState.find((car: ICar) => car.id === id);
+      car?.driveController?.abort();
+      return prevState.map((car: ICar) =>
+        car.id === id ? { ...car, status: "reset", isMove: false } : car
+      );
+    });
+  }, []);
+
   const handleRemove = useCallback((id: number): void => {
+    const car = cars.find((car: ICar) => car.id === id);
+    car?.driveController?.abort();
     fetch(`http://127.0.0.1:3000/garage/${id}`, {
       method: "DELETE",
       headers: {
@@ -80,7 +93,14 @@ const Garage: FC = () => {
       .then((params: IRace) => {
         setCars((prevState): ICar[] => {
           return prevState.map((car: ICar) =>
-            car.id === id ? { ...car, params, status: "start" } : car
+            car.id === id
+              ? {
+                  ...car,
+                  ...params,
+                  status: "start",
+                  isMove: true,
+                }
+              : car
           );
         });
         return id;
@@ -89,19 +109,34 @@ const Garage: FC = () => {
   }, []);
 
   const handleCarDrive = useCallback((id: number): void => {
+    const driveController = new AbortController();
+    setCars((prevState) =>
+      prevState.map((car: ICar) =>
+        car.id === id ? { ...car, driveController } : car
+      )
+    );
     fetch(`http://127.0.0.1:3000/engine?id=${id}&status=drive`, {
       method: "PATCH",
-    }).then((res: Response) => {
-      if (res.ok) {
-        console.log("ok");
-      } else {
+      signal: driveController.signal,
+    })
+      .then((res: Response) => {
+        if (res.ok) {
+          setCars((prevState): ICar[] => {
+            return prevState.map((car: ICar) =>
+              car.id === id ? { ...car, status: undefined } : car
+            );
+          });
+        } else {
+          throw new Error("stop");
+        }
+      })
+      .catch(() => {
         setCars((prevState): ICar[] => {
           return prevState.map((car: ICar) =>
             car.id === id ? { ...car, status: "stop" } : car
           );
         });
-      }
-    });
+      });
   }, []);
 
   return (
@@ -115,7 +150,7 @@ const Garage: FC = () => {
       />
       <CarsCount count={count} />
       <Pagination
-        limit={limit}
+        limit={Math.min(limit, cars.length)}
         max={count}
         currentPage={page}
         maxPage={Math.ceil(count / limit)}
@@ -128,6 +163,7 @@ const Garage: FC = () => {
         onSelect={handleSelect}
         onRemove={handleRemove}
         onStart={handleCarStart}
+        onReset={handleReset}
       />
     </Container>
   );

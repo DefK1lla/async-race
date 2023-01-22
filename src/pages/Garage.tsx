@@ -64,6 +64,7 @@ const Garage: FC = () => {
         car.id === id ? { ...car, status: "reset", isMove: false } : car
       );
     });
+    if (cars.every((car: ICar) => car.status !== "start")) setIsRace(false);
   }, []);
 
   const handleRemove = useCallback((id: number): void => {

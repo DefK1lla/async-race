@@ -1,6 +1,6 @@
 import styles from "./style.module.scss";
 
-import { ChangeEventHandler, FC, FormEventHandler, useState } from "react";
+import { ChangeEventHandler, FC, FormEventHandler } from "react";
 
 import { Container } from "../layout/Container";
 
@@ -13,7 +13,7 @@ export const CarForm: FC<ICarFormProps> = ({
     name: "",
   },
   onChange,
-  onSubmit
+  onSubmit,
 }) => {
   const handleNameChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     onChange?.({ ...value, name: e.target.value });
@@ -30,31 +30,16 @@ export const CarForm: FC<ICarFormProps> = ({
 
   return (
     <Container>
-      <form
-        className={styles.form}
-        onSubmit={handleSubmit}
-      >
+      <form className={styles.form} onSubmit={handleSubmit}>
         <input
           type="text"
           value={value.name}
           placeholder="Car name"
           onChange={handleNameChange}
         />
-        <input
-          type="color"
-          value={value.color}
-          onChange={handleColorChange}
-        />
-        <button
-          type="submit"
-        >
-          {isEdit ? (
-            "Update"
-          ) : (
-            "Create"
-          )}
-        </button>
+        <input type="color" value={value.color} onChange={handleColorChange} />
+        <button type="submit">{isEdit ? "Update" : "Create"}</button>
       </form>
     </Container>
   );
-}
+};

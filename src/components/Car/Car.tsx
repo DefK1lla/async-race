@@ -1,6 +1,6 @@
 import styles from "./style.module.scss";
 
-import { FC } from "react";
+import { FC, useEffect, memo } from "react";
 
 import { Container } from "../layout/Container";
 import { CarIcon } from "./CarIcon";
@@ -9,25 +9,46 @@ import { Controls } from "./Controls";
 
 import { ICarProps } from "../../typings/ICar";
 
-export const Car: FC<ICarProps> = ({ name, id, color, onSelect, onRemove }) => {
-  const handleSelect = (): void => {
-    onSelect({ name, id, color });
-  };
+export const Car: FC<ICarProps> = memo(
+  ({ name, id, color, status = "stop", onSelect, onRemove, onStart }) => {
+    console.log(1);
+    useEffect(() => {
+      if (status === "stop") {
+        console.log("stopeed");
+      } else if (status === "start") {
+        console.log("started");
+      } else if (status === "reset") {
+        console.log("reset");
+      }
+    }, [status]);
 
-  const handleRemove = (): void => {
-    onRemove(id as number);
-  };
+    const handleSelect = (): void => {
+      onSelect({ name, id, color });
+    };
 
-  return (
-    <Container>
-      <div className={styles.track}>
-        <div className={styles.header}>
-          {name}
-          <Controls onSelect={handleSelect} onRemove={handleRemove} />
+    const handleRemove = (): void => {
+      onRemove(id as number);
+    };
+
+    const handleStart = (): void => {
+      onStart(id as number);
+    };
+
+    return (
+      <Container>
+        <div className={styles.track}>
+          <div className={styles.header}>
+            {name}
+            <Controls
+              onSelect={handleSelect}
+              onRemove={handleRemove}
+              onStart={handleStart}
+            />
+          </div>
+          <CarIcon className={styles.icon} color={color} />
+          <Flag className={styles.flag} />
         </div>
-        <CarIcon className={styles.icon} color={color} />
-        <Flag className={styles.flag} />
-      </div>
-    </Container>
-  );
-};
+      </Container>
+    );
+  }
+);

@@ -1,45 +1,47 @@
+import { IRace } from "./IRace";
+
 export interface ICarFormProps {
-  isEdit?: boolean,
+  isEdit?: boolean;
   value?: {
-    name: string,
-    color: string
-  },
-  onChange?(car: ICar): void,
-  onSubmit?(car: ICar): void
-};
+    name: string;
+    color: string;
+  };
+  onChange?(car: ICar): void;
+  onSubmit?(car: ICar): void;
+}
 
 export interface ICarIconProps {
-  color?: string,
-  className?: string
-};
+  color?: string;
+  className?: string;
+}
 
 export interface IFlagProps {
-  className?: string
-};
+  className?: string;
+}
 
 export interface ICar {
-  color: string,
-  id?: number,
-  name: string,
-  status?: "start" | "stop" | "drive" | "reset"
-};
+  color: string;
+  id?: number;
+  name: string;
+  status?: "start" | "stop" | "drive" | "reset";
+  params?: IRace;
+}
 
-export interface ICarProps {
-  color: string,
-  id?: number,
-  name: string,
-  onSelect(car: ICar): void,
-  onRemove(id: number): void
-};
+export interface ICarProps extends ICar {
+  onSelect(car: ICar): void;
+  onRemove(id: number): void;
+  onStart(id: number): void;
+}
 
 export interface ICarListProps {
-  cars: ICar[],
-  page: number,
-  onSelect(car: ICar): void,
-  onRemove(id: number): void
-};
+  cars: ICar[];
+  onSelect(car: ICar): void;
+  onRemove(id: number): void;
+  onStart(id: number): void;
+}
 
 export interface IControlsProps {
-  onSelect(): void,
-  onRemove(): void
-};
+  onSelect(): void;
+  onRemove(): void;
+  onStart(): void;
+}

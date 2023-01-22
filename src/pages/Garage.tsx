@@ -1,10 +1,10 @@
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { runInThisContext } from "vm";
 
-import { CarForm, CarsCount } from "../components/Car";
-import { CarList } from "../components/Car";
+import { CarForm, CarsCount, CarList } from "../components/Car";
 import { Container } from "../components/layout/Container";
 import { Pagination } from "../components/Pagination";
+import { Race } from "../components/Race";
 
 import { ICar } from "../typings/ICar";
 import { IRace } from "../typings/IRace";
@@ -15,8 +15,8 @@ const Garage: FC = () => {
   const [count, setCount] = useState<number>(0);
   const [cars, setCars] = useState<ICar[]>([]);
   const [selectedCar, setSelectedCar] = useState<ICar>({ name: "", color: "" });
-  const [newCar, setNewCar] = useState<ICar>({ name: "", color: "" });
-  const [isAborted, setIsAborted] = useState<boolean>(false);
+  const [newCar, setNewCar] = useState<ICar>({ name: "", color: "#000000" });
+  const [isRace, setIsRace] = useState<boolean>(false);
 
   useEffect(() => {
     getCars();
@@ -64,6 +64,7 @@ const Garage: FC = () => {
         car.id === id ? { ...car, status: "reset", isMove: false } : car
       );
     });
+    if (cars.every((car: ICar) => car.status !== "start")) setIsRace(false);
   }, []);
 
   const handleRemove = useCallback((id: number): void => {
@@ -77,6 +78,10 @@ const Garage: FC = () => {
     }).then(() => getCars());
   }, []);
 
+  const handleCarStart = useCallback((id: number) => {
+    startCar(id);
+  }, []);
+
   const handleNext = useCallback((): void => {
     setPage((prevState) => prevState + 1);
   }, []);
@@ -85,8 +90,8 @@ const Garage: FC = () => {
     setPage((prevState) => prevState - 1);
   }, []);
 
-  const handleCarStart = useCallback((id: number): void => {
-    fetch(`http://127.0.0.1:3000/engine?id=${id}&status=started`, {
+  const startCar = useCallback(async (id: number): Promise<number> => {
+    return fetch(`http://127.0.0.1:3000/engine?id=${id}&status=started`, {
       method: "PATCH",
     })
       .then((res: Response) => res.json())
@@ -105,39 +110,53 @@ const Garage: FC = () => {
         });
         return id;
       })
-      .then(handleCarDrive);
+      .then(driveCar);
   }, []);
 
-  const handleCarDrive = useCallback((id: number): void => {
+  const driveCar = useCallback(async (id: number): Promise<number> => {
     const driveController = new AbortController();
     setCars((prevState) =>
       prevState.map((car: ICar) =>
         car.id === id ? { ...car, driveController } : car
       )
     );
-    fetch(`http://127.0.0.1:3000/engine?id=${id}&status=drive`, {
+
+    return fetch(`http://127.0.0.1:3000/engine?id=${id}&status=drive`, {
       method: "PATCH",
       signal: driveController.signal,
-    })
-      .then((res: Response) => {
-        if (res.ok) {
-          setCars((prevState): ICar[] => {
-            return prevState.map((car: ICar) =>
-              car.id === id ? { ...car, status: undefined } : car
-            );
-          });
-        } else {
-          throw new Error("stop");
-        }
-      })
-      .catch(() => {
+    }).then((res: Response) => {
+      if (res.ok) {
+        setCars((prevState): ICar[] => {
+          return prevState.map((car: ICar) =>
+            car.id === id ? { ...car, status: undefined } : car
+          );
+        });
+        return id;
+      } else {
         setCars((prevState): ICar[] => {
           return prevState.map((car: ICar) =>
             car.id === id ? { ...car, status: "stop" } : car
           );
         });
-      });
+
+        throw new Error("stop");
+      }
+    });
   }, []);
+
+  const handleRaceStart = useCallback(() => {
+    setIsRace(true);
+    Promise.any(cars.map((car: ICar) => startCar(car.id as number))).then(
+      (id: number) => {
+        console.log(cars.find((car) => car.id === id));
+      }
+    );
+  }, [cars]);
+
+  const handleRaceReset = () => {
+    cars.map((car: ICar) => handleReset(car.id as number));
+    setIsRace(false);
+  };
 
   return (
     <Container>
@@ -147,6 +166,11 @@ const Garage: FC = () => {
         value={selectedCar}
         onSubmit={handleUpdate}
         isEdit
+      />
+      <Race
+        onStart={handleRaceStart}
+        onReset={handleRaceReset}
+        isStarted={isRace}
       />
       <CarsCount count={count} />
       <Pagination

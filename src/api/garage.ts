@@ -1,3 +1,4 @@
+import { start } from "repl";
 import { IGetCars } from "../typings/IAPI";
 import { ICar, IWinner } from "../typings/ICar";
 import { IRace } from "../typings/IRace";
@@ -47,9 +48,13 @@ class GarageAPI {
     });
   };
 
-  startCar = async (id: number): Promise<IRace> => {
+  startCar = async (
+    id: number,
+    startController: AbortController
+  ): Promise<IRace> => {
     return fetch(`http://127.0.0.1:3000/engine?id=${id}&status=started`, {
       method: "PATCH",
+      signal: startController.signal,
     }).then((res: Response) => res.json());
   };
 

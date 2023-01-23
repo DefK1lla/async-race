@@ -4,6 +4,7 @@ import { CarForm, CarsCount, CarList } from "../components/Car";
 import { Container } from "../components/layout/Container";
 import { Pagination } from "../components/Pagination";
 import { Race } from "../components/Race";
+import { WinnerModal } from "../components/Modal";
 
 import { garageApi, winnersApi } from "../api";
 
@@ -30,6 +31,9 @@ const Garage: FC<IGarageProps> = ({ context }) => {
     setIsRace,
   } = context;
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [winnerName, setWinnerName] = useState<string>("");
+
   useEffect(() => {
     getCars();
     return handleRaceReset;
@@ -44,6 +48,11 @@ const Garage: FC<IGarageProps> = ({ context }) => {
 
   const regWinner = useCallback(
     (winner: IWinner) => {
+      if (winner.name) {
+        setWinnerName(winner.name);
+        setIsOpen(true);
+      }
+
       winnersApi.getWinner(winner.id).then((exsistedWinner: IWinner | {}) => {
         if ("time" in exsistedWinner) {
           winnersApi.updateWinner(exsistedWinner);
@@ -71,6 +80,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
     setCars((prevState) => {
       const car = prevState.find((car: ICar) => car.id === id);
       car?.driveController?.abort();
+      car?.startController?.abort();
       return prevState.map((car: ICar) =>
         car.id === id ? { ...car, status: "reset", isMove: false } : car
       );
@@ -105,7 +115,8 @@ const Garage: FC<IGarageProps> = ({ context }) => {
 
   const startCar = useCallback(
     async (id: number): Promise<IWinner> => {
-      return garageApi.startCar(id).then((params: IRace) => {
+      const startController = new AbortController();
+      return garageApi.startCar(id, startController).then((params: IRace) => {
         setCars((prevState): ICar[] => {
           return prevState.map((car: ICar) =>
             car.id === id
@@ -114,6 +125,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
                   ...params,
                   status: "start",
                   isMove: true,
+                  startController,
                 }
               : car
           );
@@ -121,6 +133,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
         return {
           id,
           time: Math.ceil(params.distance / params.velocity / 1000),
+          name: cars.find((car: ICar) => car.id === id)?.name,
         } as IWinner;
       });
     },
@@ -171,8 +184,13 @@ const Garage: FC<IGarageProps> = ({ context }) => {
     setIsRace(false);
   }, [cars]);
 
+  const handleClose = (): void => {
+    setIsOpen(false);
+  };
+
   return (
     <Container>
+      <WinnerModal isOpen={isOpen} onClose={handleClose} winner={winnerName} />
       <CarForm value={newCar} onChange={setNewCar} onSubmit={handleCreate} />
       <CarForm
         onChange={setSelectedCar}

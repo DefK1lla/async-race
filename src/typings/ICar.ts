@@ -28,6 +28,7 @@ export interface ICar {
   distance?: number;
   isMove?: boolean;
   driveController?: AbortController;
+  startController?: AbortController;
 }
 
 export interface ICarProps extends ICar {
@@ -58,6 +59,7 @@ export interface IWinner {
   wins: number;
   time: number;
   id: number;
+  name?: string;
 }
 
 export interface IWinnerCar extends ICar {

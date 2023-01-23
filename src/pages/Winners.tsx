@@ -5,12 +5,19 @@ import { Container } from "../components/layout/Container";
 import { Pagination } from "../components/Pagination";
 
 import { ICar, IWinner, IWinnerCar } from "../typings/ICar";
+import { IWinnersProps } from "../typings/IWinners";
 
-const Winners: FC = () => {
-  const [winners, setWinners] = useState<IWinnerCar[]>([]);
-  const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(10);
-  const [count, setCount] = useState<number>(0);
+const Winners: FC<IWinnersProps> = ({ context }) => {
+  const {
+    winners,
+    setWinners,
+    page,
+    setPage,
+    limit,
+    setLimit,
+    count,
+    setCount,
+  } = context;
 
   useEffect(() => {
     fetch(

@@ -1,17 +1,12 @@
-import {
-  FC,
-  useCallback,
-  useEffect,
-  useState,
-  ReactNode,
-  ChangeEventHandler,
-} from "react";
+import { FC, useCallback, useEffect, ChangeEventHandler } from "react";
+import { garageApi, winnersApi } from "../api";
 import { WinnersTable } from "../components/Car/WinnersTable";
 
 import { Container } from "../components/layout/Container";
 import { Pagination } from "../components/Pagination";
+import { IGetWinners } from "../typings/IAPI";
 
-import { ICar, IWinner } from "../typings/ICar";
+import { ICar, IWinner, IWinnerCar } from "../typings/ICar";
 import {
   IWinnersProps,
   WinnersSortOrder,
@@ -35,29 +30,20 @@ const Winners: FC<IWinnersProps> = ({ context }) => {
   } = context;
 
   useEffect(() => {
-    fetch(
-      `http://127.0.0.1:3000/winners?_page=${page}&_limit=${limit}&_sort=${sortValue}&_order=${order}`
-    )
-      .then((res: Response) => {
-        const count: string | null = res.headers.get("X-Total-Count");
-        setCount(Number(count));
-        return res.json();
-      })
-      .then((winners: IWinner[]) =>
-        Promise.all(
-          winners.map((winner: IWinner) =>
-            getCar(winner.id).then((car: ICar) => ({ ...winner, ...car }))
+    winnersApi
+      .getWinners(page, limit, sortValue, order)
+      .then((res: IGetWinners) => {
+        setCount(res.count);
+        return Promise.all(
+          res.winners.map((winner: IWinner) =>
+            garageApi
+              .getCarById(winner.id)
+              .then((car: ICar) => ({ ...winner, ...car }))
           )
-        )
-      )
+        );
+      })
       .then(setWinners);
   }, [page, limit, order, sortValue]);
-
-  const getCar = (id: number) => {
-    return fetch(`http://127.0.0.1:3000/garage/${id}`).then((res: Response) =>
-      res.json()
-    );
-  };
 
   const handlePrev = useCallback((): void => {
     setPage((prevState) => prevState - 1);
@@ -99,7 +85,7 @@ const Winners: FC<IWinnersProps> = ({ context }) => {
         limit={Math.min(limit, winners.length)}
         max={count}
         currentPage={page}
-        maxPage={Math.ceil(count / limit)}
+        maxPage={Math.ceil(count ? count / limit : 1)}
         onChange={setLimit}
         onNext={handleNext}
         onPrev={handlePrev}

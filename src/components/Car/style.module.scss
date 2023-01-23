@@ -1,0 +1,71 @@
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.count {
+  margin-bottom: 15px;
+}
+
+.icon {
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+
+  width: 150px;
+
+  &_sm {
+    width: 100px;
+  }
+}
+
+.flag {
+  position: absolute;
+  right: 150px;
+  bottom: 10px;
+  width: 60px;
+}
+
+.carT {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 150px;
+}
+
+.track {
+  position: relative;
+
+  min-width: 600px;
+  width: 100%;
+  min-height: 120px;
+  margin-bottom: 30px;
+
+  border-bottom: 5px dashed #000;
+}
+
+.control {
+  padding: 5px 10px;
+  margin: 0 15px;
+
+  & + .control {
+    margin-left: 5px;
+  }
+
+  cursor: pointer;
+}
+
+.form {
+  display: flex;
+  align-items: stretch;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.tr {
+  padding: 15px;
+  td {
+    padding: 15px;
+    text-align: center;
+  }
+}

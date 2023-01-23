@@ -13,6 +13,37 @@ import { IGarageProps } from "../typings/IGarage";
 import { IRace } from "../typings/IRace";
 import { IGetCars } from "../typings/IAPI";
 
+const carNames = [
+  "Jeep",
+  "Volvo",
+  "Toyota",
+  "BMW",
+  "Mercedes",
+  "Volkswagen",
+  "Ford",
+  "Kia",
+  "Audi",
+  "Renault",
+  "Peugeot",
+  "Porsche",
+  "Ferrari",
+];
+
+const colors = [
+  "#000000",
+  "	#FF0000",
+  "#800000",
+  "#FFFF00",
+  "FFFF00",
+  "#FF4500",
+  "#BDB76B",
+  "#FF00FF",
+  "#663399",
+  "#00FF00",
+  "#20B2AA",
+  "#40E0D0",
+];
+
 const Garage: FC<IGarageProps> = ({ context }) => {
   const {
     page,
@@ -188,6 +219,20 @@ const Garage: FC<IGarageProps> = ({ context }) => {
     setIsOpen(false);
   };
 
+  const handleGenerate = (): void => {
+    const newCars: ICar[] = [];
+    for (let i = 0; i < 100; i++) {
+      newCars.push({
+        name: carNames[Math.floor(Math.random() * carNames.length)],
+        color: colors[Math.floor(Math.random() * colors.length)],
+      });
+    }
+
+    Promise.all(newCars.map((car: ICar) => garageApi.createCar(car))).then(
+      getCars
+    );
+  };
+
   return (
     <Container>
       <WinnerModal isOpen={isOpen} onClose={handleClose} winner={winnerName} />
@@ -198,6 +243,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
         onSubmit={handleUpdate}
         isEdit
       />
+      <button onClick={handleGenerate}>Generate cars</button>
       <Race
         onStart={handleRaceStart}
         onReset={handleRaceReset}

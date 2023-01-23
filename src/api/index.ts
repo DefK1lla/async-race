@@ -1,3 +1,4 @@
-import garage from "./garage";
+import garageApi from "./garage";
+import winnersApi from "./winners";
 
-export { garage };
+export { garageApi, winnersApi };

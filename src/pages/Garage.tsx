@@ -5,7 +5,7 @@ import { Container } from "../components/layout/Container";
 import { Pagination } from "../components/Pagination";
 import { Race } from "../components/Race";
 
-import { garage } from "../api";
+import { garageApi, winnersApi } from "../api";
 
 import { ICar, IWinner } from "../typings/ICar";
 import { IGarageProps } from "../typings/IGarage";
@@ -36,7 +36,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
   }, [page, limit]);
 
   const getCars = (): void => {
-    garage.getCars(limit, page).then((res: IGetCars) => {
+    garageApi.getCars(limit, page).then((res: IGetCars) => {
       setCars(res.cars);
       setCount(res.count);
     });
@@ -44,51 +44,23 @@ const Garage: FC<IGarageProps> = ({ context }) => {
 
   const regWinner = useCallback(
     (winner: IWinner) => {
-      fetch(`http://127.0.0.1:3000/winners/${winner.id}`).then(
-        (res: Response) => {
-          if (res.ok) {
-            res.json().then(updateWinner);
-          } else {
-            const car = cars.find((car: ICar) => car.id === winner.id);
-            createWinner(winner.id, winner.time);
-          }
+      winnersApi.getWinner(winner.id).then((exsistedWinner: IWinner | {}) => {
+        if ("time" in exsistedWinner) {
+          winnersApi.updateWinner(exsistedWinner);
+        } else {
+          winnersApi.createWinner(winner.id, winner.time);
         }
-      );
+      });
     },
     [cars]
   );
 
-  const updateWinner = useCallback((winner: IWinner) => {
-    fetch(`http://127.0.0.1:3000/winners/${winner.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...winner, wins: winner.wins + 1 }),
-    });
-  }, []);
-
-  const createWinner = useCallback((id: number, time: number) => {
-    const winner = {
-      id,
-      wins: 1,
-      time,
-    };
-    fetch("http://127.0.0.1:3000/winners", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(winner),
-    });
-  }, []);
-
   const handleUpdate = useCallback((car: ICar): void => {
-    garage.updateCar(car).then(() => getCars());
+    garageApi.updateCar(car).then(() => getCars());
   }, []);
 
   const handleCreate = useCallback((car: ICar): void => {
-    garage.createCar(car).then(() => getCars());
+    garageApi.createCar(car).then(() => getCars());
   }, []);
 
   const handleSelect = useCallback((car: ICar): void => {
@@ -110,13 +82,8 @@ const Garage: FC<IGarageProps> = ({ context }) => {
     (id: number): void => {
       const car = cars.find((car: ICar) => car.id === id);
       car?.driveController?.abort();
-      garage.removeCar(id).then(() => getCars());
-      fetch(`http://127.0.0.1:3000/winners/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      garageApi.removeCar(id).then(() => getCars());
+      winnersApi.removeWinner(id);
     },
     [cars]
   );
@@ -138,7 +105,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
 
   const startCar = useCallback(
     async (id: number): Promise<IWinner> => {
-      return garage.startCar(id).then((params: IRace) => {
+      return garageApi.startCar(id).then((params: IRace) => {
         setCars((prevState): ICar[] => {
           return prevState.map((car: ICar) =>
             car.id === id
@@ -169,7 +136,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
         )
       );
 
-      return garage.driveCar(car, driveController).then((res: boolean) => {
+      return garageApi.driveCar(car, driveController).then((res: boolean) => {
         if (res) {
           setCars((prevState): ICar[] => {
             return prevState.map((c: ICar) =>
@@ -194,7 +161,9 @@ const Garage: FC<IGarageProps> = ({ context }) => {
     setIsRace(true);
     Promise.any(
       cars.map((car: ICar) => startCar(car.id as number).then(driveCar))
-    ).then(regWinner);
+    )
+      .then(regWinner)
+      .catch(() => console.log("all cars are broken"));
   }, [cars]);
 
   const handleRaceReset = useCallback(() => {

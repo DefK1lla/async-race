@@ -21,10 +21,10 @@ export const WinnersTable: FC<ITableProps> = memo(({ winners }) => {
           (winner: IWinnerCar): ReactNode => (
             <tr className={styles.tr} key={winner.id}>
               <td>{winner.id}</td>
-              <td>{winner.name}</td>
               <td>
                 <CarIcon className={styles.icon_sm} color={winner.color} />
               </td>
+              <td>{winner.name}</td>
               <td>{winner.wins}</td>
               <td>{winner.time}</td>
             </tr>

@@ -7,7 +7,7 @@ import Winners from "./pages/Winners";
 
 import { Header } from "./components/Header";
 
-import { ICar } from "./typings/ICar";
+import { ICar, IWinner } from "./typings/ICar";
 import { IGarageContext } from "./typings/IGarage";
 
 const App: FC = () => {
@@ -18,6 +18,7 @@ const App: FC = () => {
   const [selectedCar, setSelectedCar] = useState<ICar>({ name: "", color: "" });
   const [newCar, setNewCar] = useState<ICar>({ name: "", color: "#000000" });
   const [isRace, setIsRace] = useState<boolean>(false);
+  const [winners, setWinners] = useState<IWinner[]>([]);
 
   const GarageContext: IGarageContext = {
     page,

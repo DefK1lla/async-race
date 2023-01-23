@@ -53,3 +53,9 @@ export interface IControlsProps {
   onReset(): void;
   isMove?: boolean;
 }
+
+export interface IWinner {
+  wins: number;
+  time: number;
+  id: number;
+}

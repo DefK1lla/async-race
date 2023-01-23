@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { ICar, IWinner } from "./ICar";
+import { ICar } from "./ICar";
 
 export interface IGarageProps {
   context: IGarageContext;

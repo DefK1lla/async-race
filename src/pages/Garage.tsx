@@ -48,11 +48,9 @@ const Garage: FC<IGarageProps> = ({ context }) => {
       fetch(`http://127.0.0.1:3000/winners/${winner.id}`).then(
         (res: Response) => {
           if (res.ok) {
-            console.log("winner, reg", winner);
             res.json().then(updateWinner);
           } else {
             const car = cars.find((car: ICar) => car.id === winner.id);
-            console.log(car);
             createWinner(winner.id, winner.time);
           }
         }
@@ -62,7 +60,6 @@ const Garage: FC<IGarageProps> = ({ context }) => {
   );
 
   const updateWinner = useCallback((winner: IWinner) => {
-    console.log(winner, "winner update");
     fetch(`http://127.0.0.1:3000/winners/${winner.id}`, {
       method: "PATCH",
       headers: {

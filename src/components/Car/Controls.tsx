@@ -35,7 +35,11 @@ export const Controls: FC<IControlsProps> = ({
       >
         A
       </button>
-      <button className={styles.control} onClick={handleReset}>
+      <button
+        className={styles.control}
+        onClick={handleReset}
+        disabled={!isMove}
+      >
         B
       </button>
 

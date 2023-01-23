@@ -1,6 +1,6 @@
 import { FC, memo } from "react";
 
-import { ICar, ICarListProps } from "../../typings/ICar";
+import { ICarListProps } from "../../typings/ICar";
 import { Container } from "../layout/Container";
 
 import { Car } from "./Car";

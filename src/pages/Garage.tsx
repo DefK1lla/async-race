@@ -6,7 +6,7 @@ import { Container } from "../components/layout/Container";
 import { Pagination } from "../components/Pagination";
 import { Race } from "../components/Race";
 
-import { ICar } from "../typings/ICar";
+import { ICar, IWinner } from "../typings/ICar";
 import { IGarageProps } from "../typings/IGarage";
 import { IRace } from "../typings/IRace";
 
@@ -30,9 +30,10 @@ const Garage: FC<IGarageProps> = ({ context }) => {
 
   useEffect(() => {
     getCars();
+    return handleRaceReset;
   }, [page, limit]);
 
-  const getCars = useCallback((): void => {
+  const getCars = (): void => {
     fetch(`http://127.0.0.1:3000/garage?_limit=${limit}&_page=${page}`)
       .then((res: Response) => {
         const count: string | null = res.headers.get("X-Total-Count");
@@ -40,6 +41,47 @@ const Garage: FC<IGarageProps> = ({ context }) => {
         return res.json();
       })
       .then((cars: ICar[]) => setCars(cars));
+  };
+
+  const regWinner = useCallback(
+    (winner: IWinner) => {
+      fetch(`http://127.0.0.1:3000/winners/${winner.id}`).then(
+        (res: Response) => {
+          if (res.ok) {
+            res.json().then(updateWinner);
+          } else {
+            const car = cars.find((car: ICar) => car.id === winner.id);
+            createWinner(winner.id, winner.time);
+          }
+        }
+      );
+    },
+    [cars]
+  );
+
+  const updateWinner = useCallback((winner: IWinner) => {
+    fetch(`http://127.0.0.1:3000/winners/${winner.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...winner, wins: winner.wins + 1 }),
+    });
+  }, []);
+
+  const createWinner = useCallback((id: number, time: number) => {
+    const winner = {
+      id,
+      wins: 1,
+      time,
+    };
+    fetch("http://127.0.0.1:3000/winners", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(winner),
+    });
   }, []);
 
   const handleUpdate = useCallback((car: ICar): void => {
@@ -77,20 +119,32 @@ const Garage: FC<IGarageProps> = ({ context }) => {
     if (cars.every((car: ICar) => car.status !== "start")) setIsRace(false);
   }, []);
 
-  const handleRemove = useCallback((id: number): void => {
-    const car = cars.find((car: ICar) => car.id === id);
-    car?.driveController?.abort();
-    fetch(`http://127.0.0.1:3000/garage/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(() => getCars());
-  }, []);
+  const handleRemove = useCallback(
+    (id: number): void => {
+      const car = cars.find((car: ICar) => car.id === id);
+      car?.driveController?.abort();
+      fetch(`http://127.0.0.1:3000/garage/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }).then(() => getCars());
+      fetch(`http://127.0.0.1:3000/winners/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    },
+    [cars]
+  );
 
-  const handleCarStart = useCallback((id: number) => {
-    startCar(id);
-  }, []);
+  const handleCarStart = useCallback(
+    (id: number) => {
+      startCar(id);
+    },
+    [cars]
+  );
 
   const handleNext = useCallback((): void => {
     setPage((prevState) => prevState + 1);
@@ -100,73 +154,78 @@ const Garage: FC<IGarageProps> = ({ context }) => {
     setPage((prevState) => prevState - 1);
   }, []);
 
-  const startCar = useCallback(async (id: number): Promise<number> => {
-    return fetch(`http://127.0.0.1:3000/engine?id=${id}&status=started`, {
-      method: "PATCH",
-    })
-      .then((res: Response) => res.json())
-      .then((params: IRace) => {
-        setCars((prevState): ICar[] => {
-          return prevState.map((car: ICar) =>
-            car.id === id
-              ? {
-                  ...car,
-                  ...params,
-                  status: "start",
-                  isMove: true,
-                }
-              : car
-          );
-        });
-        return id;
+  const startCar = useCallback(
+    async (id: number): Promise<IWinner> => {
+      return fetch(`http://127.0.0.1:3000/engine?id=${id}&status=started`, {
+        method: "PATCH",
       })
-      .then(driveCar);
-  }, []);
-
-  const driveCar = useCallback(async (id: number): Promise<number> => {
-    const driveController = new AbortController();
-    setCars((prevState) =>
-      prevState.map((car: ICar) =>
-        car.id === id ? { ...car, driveController } : car
-      )
-    );
-
-    return fetch(`http://127.0.0.1:3000/engine?id=${id}&status=drive`, {
-      method: "PATCH",
-      signal: driveController.signal,
-    }).then((res: Response) => {
-      if (res.ok) {
-        setCars((prevState): ICar[] => {
-          return prevState.map((car: ICar) =>
-            car.id === id ? { ...car, status: undefined } : car
-          );
+        .then((res: Response) => res.json())
+        .then((params: IRace) => {
+          setCars((prevState): ICar[] => {
+            return prevState.map((car: ICar) =>
+              car.id === id
+                ? {
+                    ...car,
+                    ...params,
+                    status: "start",
+                    isMove: true,
+                  }
+                : car
+            );
+          });
+          return {
+            id,
+            time: Math.ceil(params.distance / params.velocity / 1000),
+          } as IWinner;
         });
-        return id;
-      } else {
-        setCars((prevState): ICar[] => {
-          return prevState.map((car: ICar) =>
-            car.id === id ? { ...car, status: "stop" } : car
-          );
-        });
+    },
+    [cars]
+  );
 
+  const driveCar = useCallback(
+    async (car: IWinner): Promise<IWinner> => {
+      const driveController = new AbortController();
+      setCars((prevState) =>
+        prevState.map((c: ICar) =>
+          c.id === car.id ? { ...c, driveController } : c
+        )
+      );
+
+      return fetch(`http://127.0.0.1:3000/engine?id=${car.id}&status=drive`, {
+        method: "PATCH",
+        signal: driveController.signal,
+      }).then((res: Response) => {
+        if (res.ok) {
+          setCars((prevState): ICar[] => {
+            return prevState.map((c: ICar) =>
+              c.id === car.id ? { ...c, status: undefined } : c
+            );
+          });
+          return car;
+        } else {
+          setCars((prevState): ICar[] => {
+            return prevState.map((c: ICar) =>
+              c.id === car.id ? { ...c, status: "stop" } : c
+            );
+          });
+        }
         throw new Error("stop");
-      }
-    });
-  }, []);
+      });
+    },
+    [cars]
+  );
 
   const handleRaceStart = useCallback(() => {
     setIsRace(true);
-    Promise.any(cars.map((car: ICar) => startCar(car.id as number))).then(
-      (id: number) => {
-        console.log(cars.find((car) => car.id === id));
-      }
-    );
+    Promise.any(
+      cars.map((car: ICar) => startCar(car.id as number).then(driveCar))
+    ).then(regWinner);
   }, [cars]);
 
-  const handleRaceReset = () => {
+  const handleRaceReset = useCallback(() => {
     cars.map((car: ICar) => handleReset(car.id as number));
     setIsRace(false);
-  };
+  }, [cars]);
 
   return (
     <Container>

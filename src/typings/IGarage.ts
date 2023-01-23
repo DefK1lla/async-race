@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { ICar } from "./ICar";
+import { ICar, IWinner } from "./ICar";
 
 export interface IGarageProps {
   context: IGarageContext;
@@ -10,10 +10,10 @@ export interface IGarageContext {
   page: number;
   limit: number;
   count: number;
-  cars: ICar[];
-  selectedCar: ICar;
-  newCar: ICar;
   isRace: boolean;
+  newCar: ICar;
+  selectedCar: ICar;
+  cars: ICar[];
   setPage: Dispatch<SetStateAction<number>>;
   setLimit: Dispatch<SetStateAction<number>>;
   setCount: Dispatch<SetStateAction<number>>;

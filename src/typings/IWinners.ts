@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-import { IWinnerCar } from "./ICar";
+import { IWinner, IWinnerCar } from "./ICar";
 
 export interface IWinnersProps {
   context: IWinnersContext;
@@ -15,4 +15,12 @@ export interface IWinnersContext {
   setLimit: Dispatch<SetStateAction<number>>;
   setCount: Dispatch<SetStateAction<number>>;
   setWinners: Dispatch<SetStateAction<IWinnerCar[]>>;
+  order: WinnersSortOrder;
+  setOrder: Dispatch<SetStateAction<WinnersSortOrder>>;
+  sortValue: WinnersSortValue;
+  setSortValue: Dispatch<SetStateAction<WinnersSortValue>>;
 }
+
+export type WinnersSortOrder = "ASC" | "DESC";
+
+export type WinnersSortValue = keyof IWinner;

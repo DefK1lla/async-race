@@ -9,7 +9,11 @@ import { Header } from "./components/Header";
 
 import { ICar, IWinnerCar } from "./typings/ICar";
 import { IGarageContext } from "./typings/IGarage";
-import { IWinnersContext } from "./typings/IWinners";
+import {
+  IWinnersContext,
+  WinnersSortOrder,
+  WinnersSortValue,
+} from "./typings/IWinners";
 
 const App: FC = () => {
   const [garagePage, setGaragePage] = useState<number>(1);
@@ -24,6 +28,10 @@ const App: FC = () => {
   const [winnersPage, setWinnersPage] = useState<number>(1);
   const [winnersLimit, setWinnersLimit] = useState<number>(10);
   const [winnersCount, setWinnersCount] = useState<number>(0);
+  const [winnersSortValue, setWinnersSortValue] =
+    useState<WinnersSortValue>("id");
+  const [winnersSortOrder, setWinnersSortOrder] =
+    useState<WinnersSortOrder>("ASC");
 
   const GarageContext: IGarageContext = {
     page: garagePage,
@@ -51,6 +59,10 @@ const App: FC = () => {
     setLimit: setWinnersLimit,
     count: winnersCount,
     setCount: setWinnersCount,
+    order: winnersSortOrder,
+    setOrder: setWinnersSortOrder,
+    sortValue: winnersSortValue,
+    setSortValue: setWinnersSortValue,
   };
 
   return (

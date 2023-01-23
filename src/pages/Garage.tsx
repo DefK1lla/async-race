@@ -7,16 +7,26 @@ import { Pagination } from "../components/Pagination";
 import { Race } from "../components/Race";
 
 import { ICar } from "../typings/ICar";
+import { IGarageProps } from "../typings/IGarage";
 import { IRace } from "../typings/IRace";
 
-const Garage: FC = () => {
-  const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(7);
-  const [count, setCount] = useState<number>(0);
-  const [cars, setCars] = useState<ICar[]>([]);
-  const [selectedCar, setSelectedCar] = useState<ICar>({ name: "", color: "" });
-  const [newCar, setNewCar] = useState<ICar>({ name: "", color: "#000000" });
-  const [isRace, setIsRace] = useState<boolean>(false);
+const Garage: FC<IGarageProps> = ({ context }) => {
+  const {
+    page,
+    setPage,
+    limit,
+    setLimit,
+    count,
+    setCount,
+    cars,
+    setCars,
+    selectedCar,
+    setSelectedCar,
+    newCar,
+    setNewCar,
+    isRace,
+    setIsRace,
+  } = context;
 
   useEffect(() => {
     getCars();

@@ -1,0 +1,27 @@
+.wrapper {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 999;
+  transform: translate(-50%, -50%);
+
+  height: 200px;
+  width: 500px;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  background: #fff;
+  border: 1px solid #000;
+}
+
+.open {
+  display: flex;
+}
+
+.close {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+}

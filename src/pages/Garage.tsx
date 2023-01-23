@@ -30,10 +30,10 @@ const Garage: FC<IGarageProps> = ({ context }) => {
 
   useEffect(() => {
     getCars();
-    // return handleRaceReset;
+    return handleRaceReset;
   }, [page, limit]);
 
-  const getCars = useCallback((): void => {
+  const getCars = (): void => {
     fetch(`http://127.0.0.1:3000/garage?_limit=${limit}&_page=${page}`)
       .then((res: Response) => {
         const count: string | null = res.headers.get("X-Total-Count");
@@ -41,7 +41,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
         return res.json();
       })
       .then((cars: ICar[]) => setCars(cars));
-  }, []);
+  };
 
   const regWinner = useCallback(
     (winner: IWinner) => {
@@ -237,10 +237,10 @@ const Garage: FC<IGarageProps> = ({ context }) => {
       />
       <CarsCount count={count} />
       <Pagination
-        limit={limit}
+        limit={Math.min(limit, cars.length)}
         max={count}
         currentPage={page}
-        maxPage={Math.ceil(count / limit)}
+        maxPage={limit}
         onChange={setLimit}
         onNext={handleNext}
         onPrev={handlePrev}

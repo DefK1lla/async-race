@@ -6,12 +6,13 @@ import {
   ReactNode,
   ChangeEventHandler,
 } from "react";
+import { garage } from "../api";
 import { WinnersTable } from "../components/Car/WinnersTable";
 
 import { Container } from "../components/layout/Container";
 import { Pagination } from "../components/Pagination";
 
-import { ICar, IWinner } from "../typings/ICar";
+import { ICar, IWinner, IWinnerCar } from "../typings/ICar";
 import {
   IWinnersProps,
   WinnersSortOrder,
@@ -43,21 +44,18 @@ const Winners: FC<IWinnersProps> = ({ context }) => {
         setCount(Number(count));
         return res.json();
       })
-      .then((winners: IWinner[]) =>
-        Promise.all(
-          winners.map((winner: IWinner) =>
-            getCar(winner.id).then((car: ICar) => ({ ...winner, ...car }))
+      .then(
+        (winners: IWinner[]): Promise<IWinnerCar[]> =>
+          Promise.all(
+            winners.map((winner: IWinner) =>
+              garage
+                .getCarById(winner.id)
+                .then((car: ICar) => ({ ...winner, ...car }))
+            )
           )
-        )
       )
       .then(setWinners);
   }, [page, limit, order, sortValue]);
-
-  const getCar = (id: number) => {
-    return fetch(`http://127.0.0.1:3000/garage/${id}`).then((res: Response) =>
-      res.json()
-    );
-  };
 
   const handlePrev = useCallback((): void => {
     setPage((prevState) => prevState - 1);

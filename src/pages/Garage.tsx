@@ -169,7 +169,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
           });
           return {
             id,
-            time: params.distance / params.velocity / 1000,
+            time: Math.ceil(params.distance / params.velocity / 1000),
           } as IWinner;
         });
     },
@@ -240,7 +240,7 @@ const Garage: FC<IGarageProps> = ({ context }) => {
         limit={Math.min(limit, cars.length)}
         max={count}
         currentPage={page}
-        maxPage={limit}
+        maxPage={Math.ceil(count / limit)}
         onChange={setLimit}
         onNext={handleNext}
         onPrev={handlePrev}

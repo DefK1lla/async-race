@@ -13,6 +13,10 @@
   left: 0;
 
   width: 150px;
+
+  &_sm {
+    width: 100px;
+  }
 }
 
 .flag {
@@ -56,4 +60,11 @@
   align-items: stretch;
   gap: 15px;
   margin: 15px 0;
+}
+
+.tr {
+  padding: 15px;
+  td {
+    padding: 15px;
+  }
 }

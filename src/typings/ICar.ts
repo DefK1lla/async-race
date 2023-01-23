@@ -59,3 +59,13 @@ export interface IWinner {
   time: number;
   id: number;
 }
+
+export interface IWinnerCar extends ICar {
+  wins: number;
+  time: number;
+  id: number;
+}
+
+export interface ITableProps {
+  winners: IWinnerCar[];
+}
